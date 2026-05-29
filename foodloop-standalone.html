@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FoodLoop — Reaproveitamento Sustentável de Alimentos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green-neon:#7ed957;
+  --green-dark:#3f6b1f;
+  --green-deep:#1c3a10;
+  --orange:#ff6b1a;
+  --red:#d93b1e;
+  --yellow:#f5c842;
+  --bg:#0d1408;
+  --bg-2:#13200c;
+  --surface:#1a2913;
+  --surface-2:#22361a;
+  --text:#f1f7ea;
+  --muted:#9ab184;
+  --border:rgba(126,217,87,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:radial-gradient(1200px 600px at 80% -10%,rgba(126,217,87,.12),transparent 60%),
+             radial-gradient(900px 500px at -10% 100%,rgba(255,107,26,.10),transparent 60%),
+             var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{
+  background:linear-gradient(180deg,var(--bg-2),var(--bg));
+  border-right:1px solid var(--border);
+  padding:24px 18px;
+  position:sticky;top:0;height:100vh;
+  display:flex;flex-direction:column;gap:24px;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{width:54px;height:54px;border-radius:14px;object-fit:cover;box-shadow:0 6px 22px rgba(126,217,87,.35)}
+.brand h1{font-family:'Fraunces',serif;font-size:22px;font-weight:900;letter-spacing:-.5px;background:linear-gradient(90deg,var(--green-neon),var(--orange));-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand p{font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+nav{display:flex;flex-direction:column;gap:6px}
+.nav-item{
+  display:flex;align-items:center;gap:12px;
+  background:transparent;border:none;color:var(--muted);
+  font:600 14px/1 'Inter',sans-serif;
+  padding:12px 14px;border-radius:12px;cursor:pointer;
+  transition:all .25s ease;text-align:left;
+}
+.nav-item svg{width:18px;height:18px}
+.nav-item:hover{background:var(--surface);color:var(--text)}
+.nav-item.active{
+  background:linear-gradient(90deg,rgba(126,217,87,.18),rgba(126,217,87,.04));
+  color:var(--green-neon);
+  box-shadow:inset 3px 0 0 var(--green-neon);
+}
+.leaf-deco{
+  margin-top:auto;display:flex;align-items:center;gap:8px;
+  color:var(--green-neon);font-size:12px;opacity:.75;
+}
+.leaf-deco svg{width:18px;height:18px}
+
+/* MAIN */
+.main{padding:36px 44px;max-width:1400px;width:100%}
+.section{display:none;animation:fade .45s ease both}
+.section.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.page-head{margin-bottom:28px}
+.eyebrow{display:inline-block;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--orange);font-weight:700;margin-bottom:8px}
+.page-head h2{font-family:'Fraunces',serif;font-size:38px;font-weight:800;letter-spacing:-1px;line-height:1.1}
+.page-head p{color:var(--muted);margin-top:8px;font-size:15px}
+
+/* CARDS */
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:28px}
+.card{
+  background:linear-gradient(160deg,var(--surface),var(--surface-2));
+  border:1px solid var(--border);
+  border-radius:20px;padding:22px;
+  position:relative;overflow:hidden;
+  animation:rise .6s cubic-bezier(.2,.8,.2,1) both;
+}
+.card:nth-child(2){animation-delay:.08s}
+.card:nth-child(3){animation-delay:.16s}
+.card:nth-child(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.card-icon{
+  width:44px;height:44px;border-radius:12px;display:grid;place-items:center;margin-bottom:14px;
+  background:rgba(126,217,87,.14);color:var(--green-neon);
+}
+.card-icon svg{width:22px;height:22px}
+.card-reuse .card-icon{background:rgba(126,217,87,.16);color:var(--green-neon)}
+.card-compost .card-icon{background:rgba(245,200,66,.16);color:var(--yellow)}
+.card-discard .card-icon{background:rgba(217,59,30,.18);color:var(--red)}
+.card-total .card-icon{background:rgba(255,107,26,.18);color:var(--orange)}
+.card-label{color:var(--muted);font-size:13px;font-weight:500;margin-bottom:6px}
+.card-value{font-family:'Fraunces',serif;font-size:38px;font-weight:800;letter-spacing:-1px}
+.card-value small{font-size:14px;color:var(--muted);font-weight:500;margin-left:6px;font-family:'Inter',sans-serif}
+.card::after{
+  content:"";position:absolute;inset:auto -30px -30px auto;width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle,rgba(126,217,87,.10),transparent 70%);
+}
+
+/* PANELS */
+.grid-2{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
+.panel{
+  background:linear-gradient(160deg,var(--surface),var(--surface-2));
+  border:1px solid var(--border);
+  border-radius:20px;padding:22px;
+  animation:rise .6s cubic-bezier(.2,.8,.2,1) both;
+}
+.panel h4{font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-bottom:14px}
+.recent-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+.recent-list li{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.02);
+  border:1px solid rgba(255,255,255,.04);
+}
+.recent-list .name{font-weight:600;font-size:14px}
+.recent-list .meta{font-size:12px;color:var(--muted)}
+
+/* FORM */
+.form-panel{
+  display:grid;grid-template-columns:1fr 1fr;gap:18px;
+  background:linear-gradient(160deg,var(--surface),var(--surface-2));
+  border:1px solid var(--border);border-radius:20px;padding:28px;
+  max-width:780px;
+}
+.form-panel label{display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--muted);font-weight:600}
+.form-panel input,.form-panel select{
+  background:var(--bg);border:1px solid var(--border);
+  color:var(--text);padding:12px 14px;border-radius:12px;font:500 14px 'Inter',sans-serif;
+  transition:border .2s;
+}
+.form-panel input:focus,.form-panel select:focus{outline:none;border-color:var(--green-neon)}
+.btn-primary{
+  grid-column:1/-1;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:linear-gradient(90deg,var(--green-neon),var(--green-dark));
+  color:var(--green-deep);border:none;padding:14px 22px;border-radius:12px;
+  font:800 14px 'Inter',sans-serif;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;
+  box-shadow:0 8px 24px rgba(126,217,87,.3);transition:transform .2s;
+}
+.btn-primary svg{width:18px;height:18px}
+.btn-primary:hover{transform:translateY(-2px)}
+
+/* TABLE */
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:14px 12px;text-align:left;font-size:14px;border-bottom:1px solid var(--border)}
+.table th{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.table tr:last-child td{border-bottom:none}
+.badge{display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.04em}
+.badge-reuse{background:rgba(126,217,87,.18);color:var(--green-neon)}
+.badge-compost{background:rgba(245,200,66,.18);color:var(--yellow)}
+.badge-discard{background:rgba(217,59,30,.2);color:#ff7a5e}
+.btn-del{
+  background:transparent;border:1px solid rgba(217,59,30,.4);color:#ff7a5e;
+  padding:6px 12px;border-radius:8px;font:600 12px 'Inter',sans-serif;cursor:pointer;transition:all .2s;
+}
+.btn-del:hover{background:rgba(217,59,30,.18)}
+
+/* RESPONSIVE */
+@media(max-width:960px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:relative;height:auto;flex-direction:row;flex-wrap:wrap;gap:16px}
+  .sidebar nav{flex-direction:row;flex-wrap:wrap;flex:1}
+  .leaf-deco{display:none}
+  .main{padding:24px 20px}
+  .cards{grid-template-columns:repeat(2,1fr)}
+  .grid-2{grid-template-columns:1fr}
+  .form-panel{grid-template-columns:1fr}
+  .page-head h2{font-size:28px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="foodloop-logo.jpg" alt="FoodLoop" />
+      <div>
+        <h1>FoodLoop</h1>
+        <p>Ibirapitanga · BA</p>
+      </div>
+    </div>
+    <nav>
+      <button class="nav-item active" data-section="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" data-section="registrar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Registrar
+      </button>
+      <button class="nav-item" data-section="historico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        Histórico
+      </button>
+      <button class="nav-item" data-section="relatorio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        Relatório
+      </button>
+    </nav>
+    <div class="leaf-deco">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 8C8 10 5 16 3 21l1.5 1C8 17 11 15 17 14V8z"/></svg>
+      Consciência ambiental
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="section active">
+      <header class="page-head">
+        <div>
+          <span class="eyebrow">Sistema Inteligente</span>
+          <h2>Reaproveitamento de Resíduos Hortifruti</h2>
+          <p>Monitore, classifique e reduza o desperdício em tempo real.</p>
+        </div>
+      </header>
+      <div class="cards">
+        <article class="card card-total">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 4v5h-5"/></svg>
+          </div>
+          <p class="card-label">Total coletado</p>
+          <h3 class="card-value"><span id="kpiTotal">0</span><small>kg</small></h3>
+        </article>
+        <article class="card card-reuse">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 8C8 10 5 16 3 21"/><path d="M21 3c-4 1-7 4-9 9"/></svg>
+          </div>
+          <p class="card-label">Reaproveitáveis</p>
+          <h3 class="card-value"><span id="kpiReuse">0</span><small>kg</small></h3>
+        </article>
+        <article class="card card-compost">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 14c2 2 6 2 8 0"/></svg>
+          </div>
+          <p class="card-label">Compostagem</p>
+          <h3 class="card-value"><span id="kpiCompost">0</span><small>kg</small></h3>
+        </article>
+        <article class="card card-discard">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>
+          </div>
+          <p class="card-label">Descarte final</p>
+          <h3 class="card-value"><span id="kpiDiscard">0</span><small>kg</small></h3>
+        </article>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <h4>Distribuição por categoria</h4>
+          <canvas id="miniChart" width="600" height="280"></canvas>
+        </div>
+        <div class="panel">
+          <h4>Últimos registros</h4>
+          <ul id="recentList" class="recent-list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- REGISTRAR -->
+    <section id="registrar" class="section">
+      <header class="page-head">
+        <div>
+          <span class="eyebrow">Novo lançamento</span>
+          <h2>Registrar Resíduo</h2>
+          <p>Adicione uma nova coleta ao sistema.</p>
+        </div>
+      </header>
+      <form id="form" class="form-panel">
+        <label>
+          <span>Nome do item</span>
+          <input type="text" id="nome" required placeholder="Ex: Tomate" />
+        </label>
+        <label>
+          <span>Quantidade (kg)</span>
+          <input type="number" id="qtd" required min="0.01" step="0.01" placeholder="0.00" />
+        </label>
+        <label>
+          <span>Data da coleta</span>
+          <input type="date" id="data" required />
+        </label>
+        <label>
+          <span>Classificação</span>
+          <select id="classe" required>
+            <option value="Reaproveitável">Reaproveitável</option>
+            <option value="Compostagem">Compostagem</option>
+            <option value="Descarte final">Descarte final</option>
+          </select>
+        </label>
+        <button type="submit" class="btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg>
+          Registrar coleta
+        </button>
+      </form>
+    </section>
+
+    <!-- HISTORICO -->
+    <section id="historico" class="section">
+      <header class="page-head">
+        <div>
+          <span class="eyebrow">Registros</span>
+          <h2>Histórico de Coletas</h2>
+          <p>Todos os resíduos lançados no sistema.</p>
+        </div>
+      </header>
+      <div class="panel">
+        <table class="table">
+          <thead>
+            <tr><th>Item</th><th>Quantidade</th><th>Data</th><th>Classificação</th><th></th></tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- RELATORIO -->
+    <section id="relatorio" class="section">
+      <header class="page-head">
+        <div>
+          <span class="eyebrow">Análise visual</span>
+          <h2>Relatório por Categoria</h2>
+          <p>Distribuição percentual dos resíduos.</p>
+        </div>
+      </header>
+      <div class="grid-2">
+        <div class="panel">
+          <h4>Barras</h4>
+          <canvas id="barChart" width="600" height="340"></canvas>
+        </div>
+        <div class="panel">
+          <h4>Pizza</h4>
+          <canvas id="pieChart" width="600" height="340"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+// ===== Data =====
+const STORAGE_KEY = 'foodloop_data_v1';
+const seed = [
+  { id: 1, nome: 'Tomate', qtd: 2.0, data: '2025-05-20', classe: 'Reaproveitável' },
+  { id: 2, nome: 'Banana', qtd: 1.5, data: '2025-05-21', classe: 'Reaproveitável' },
+  { id: 3, nome: 'Alface', qtd: 1.0, data: '2025-05-22', classe: 'Compostagem' },
+  { id: 4, nome: 'Folhas e Cascas', qtd: 0.5, data: '2025-05-22', classe: 'Descarte final' },
+];
+let data = load();
+function load(){
+  try{ const s = JSON.parse(localStorage.getItem(STORAGE_KEY)); return Array.isArray(s)&&s.length?s:seed.slice(); }
+  catch{ return seed.slice(); }
+}
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+// ===== Navigation =====
+const navBtns = document.querySelectorAll('.nav-item');
+const sections = document.querySelectorAll('.section');
+navBtns.forEach(b => b.addEventListener('click', () => {
+  navBtns.forEach(x => x.classList.remove('active'));
+  sections.forEach(s => s.classList.remove('active'));
+  b.classList.add('active');
+  document.getElementById(b.dataset.section).classList.add('active');
+  renderAll();
+}));
+
+// ===== Form =====
+document.getElementById('data').valueAsDate = new Date();
+document.getElementById('form').addEventListener('submit', e => {
+  e.preventDefault();
+  const item = {
+    id: Date.now(),
+    nome: document.getElementById('nome').value.trim(),
+    qtd: parseFloat(document.getElementById('qtd').value),
+    data: document.getElementById('data').value,
+    classe: document.getElementById('classe').value,
+  };
+  data.unshift(item);
+  save();
+  e.target.reset();
+  document.getElementById('data').valueAsDate = new Date();
+  document.querySelector('[data-section="historico"]').click();
+});
+
+// ===== Render =====
+function totals(){
+  const t = { total:0, 'Reaproveitável':0, 'Compostagem':0, 'Descarte final':0 };
+  data.forEach(d => { t.total += d.qtd; t[d.classe] += d.qtd; });
+  return t;
+}
+function fmt(n){ return n.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:2}); }
+
+function renderKPIs(){
+  const t = totals();
+  document.getElementById('kpiTotal').textContent = fmt(t.total);
+  document.getElementById('kpiReuse').textContent = fmt(t['Reaproveitável']);
+  document.getElementById('kpiCompost').textContent = fmt(t['Compostagem']);
+  document.getElementById('kpiDiscard').textContent = fmt(t['Descarte final']);
+}
+function badge(c){
+  if(c==='Reaproveitável') return '<span class="badge badge-reuse">Reaproveitável</span>';
+  if(c==='Compostagem') return '<span class="badge badge-compost">Compostagem</span>';
+  return '<span class="badge badge-discard">Descarte final</span>';
+}
+function renderTable(){
+  const tb = document.getElementById('tbody');
+  tb.innerHTML = data.map(d => `
+    <tr>
+      <td>${escapeHtml(d.nome)}</td>
+      <td>${fmt(d.qtd)} kg</td>
+      <td>${new Date(d.data+'T00:00').toLocaleDateString('pt-BR')}</td>
+      <td>${badge(d.classe)}</td>
+      <td><button class="btn-del" data-id="${d.id}">Excluir</button></td>
+    </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">Nenhum registro</td></tr>';
+  tb.querySelectorAll('.btn-del').forEach(b => b.addEventListener('click', () => {
+    data = data.filter(d => d.id !== +b.dataset.id);
+    save(); renderAll();
+  }));
+}
+function renderRecent(){
+  const ul = document.getElementById('recentList');
+  ul.innerHTML = data.slice(0,5).map(d => `
+    <li><div><div class="name">${escapeHtml(d.nome)}</div><div class="meta">${new Date(d.data+'T00:00').toLocaleDateString('pt-BR')} · ${fmt(d.qtd)} kg</div></div>${badge(d.classe)}</li>
+  `).join('') || '<li style="color:var(--muted);justify-content:center">Nenhum registro</li>';
+}
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// ===== Charts (Canvas) =====
+const COLORS = { 'Reaproveitável':'#7ed957', 'Compostagem':'#f5c842', 'Descarte final':'#d93b1e' };
+
+function drawBars(canvas){
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.clientWidth, H = canvas.clientHeight;
+  canvas.width = W*dpr; canvas.height = H*dpr; ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,H);
+  const t = totals();
+  const cats = ['Reaproveitável','Compostagem','Descarte final'];
+  const max = Math.max(...cats.map(c=>t[c]),1);
+  const padL=50, padB=40, padT=20, padR=20;
+  const cw = (W-padL-padR)/cats.length;
+  const bw = cw*0.55;
+  ctx.font = '500 12px Inter, sans-serif';
+  ctx.strokeStyle='rgba(255,255,255,.06)'; ctx.fillStyle='#9ab184';
+  for(let i=0;i<=4;i++){
+    const y = padT + (H-padT-padB)*i/4;
+    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(W-padR,y); ctx.stroke();
+    ctx.fillText(fmt(max*(1-i/4))+'kg', 6, y+4);
+  }
+  cats.forEach((c,i) => {
+    const v = t[c];
+    const h = (H-padT-padB)*(v/max);
+    const x = padL + cw*i + (cw-bw)/2;
+    const y = H-padB-h;
+    const grad = ctx.createLinearGradient(0,y,0,H-padB);
+    grad.addColorStop(0, COLORS[c]); grad.addColorStop(1, COLORS[c]+'55');
+    ctx.fillStyle = grad;
+    roundRect(ctx,x,y,bw,h,8); ctx.fill();
+    ctx.fillStyle = '#f1f7ea'; ctx.textAlign='center';
+    ctx.fillText(fmt(v)+'kg', x+bw/2, y-8);
+    ctx.fillStyle = '#9ab184';
+    ctx.fillText(c, x+bw/2, H-padB+18);
+    ctx.textAlign='left';
+  });
+}
+function roundRect(ctx,x,y,w,h,r){
+  r = Math.min(r,h/2,w/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h); ctx.lineTo(x,y+h); ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+}
+function drawPie(canvas){
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.clientWidth, H = canvas.clientHeight;
+  canvas.width = W*dpr; canvas.height = H*dpr; ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,H);
+  const t = totals();
+  const cats = ['Reaproveitável','Compostagem','Descarte final'];
+  const total = cats.reduce((a,c)=>a+t[c],0) || 1;
+  const cx = W/2 - 60, cy = H/2, r = Math.min(W,H)/2 - 30;
+  let a0 = -Math.PI/2;
+  cats.forEach(c => {
+    const slice = (t[c]/total)*Math.PI*2;
+    ctx.beginPath(); ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,a0,a0+slice); ctx.closePath();
+    ctx.fillStyle = COLORS[c]; ctx.fill();
+    ctx.strokeStyle = '#1a2913'; ctx.lineWidth = 3; ctx.stroke();
+    a0 += slice;
+  });
+  ctx.beginPath(); ctx.arc(cx,cy,r*0.5,0,Math.PI*2); ctx.fillStyle='#1a2913'; ctx.fill();
+  ctx.fillStyle='#f1f7ea'; ctx.font='800 22px Fraunces, serif'; ctx.textAlign='center';
+  ctx.fillText(fmt(total)+'kg', cx, cy+2);
+  ctx.font='500 11px Inter, sans-serif'; ctx.fillStyle='#9ab184';
+  ctx.fillText('Total geral', cx, cy+20);
+  ctx.textAlign='left'; ctx.font='600 12px Inter, sans-serif';
+  cats.forEach((c,i) => {
+    const ly = cy - 30 + i*26;
+    ctx.fillStyle = COLORS[c]; roundRect(ctx, W-130, ly-10, 14, 14, 4); ctx.fill();
+    ctx.fillStyle = '#f1f7ea'; ctx.fillText(c, W-110, ly);
+    ctx.fillStyle = '#9ab184'; ctx.font='500 11px Inter, sans-serif';
+    ctx.fillText(fmt((t[c]/total)*100)+'%', W-110, ly+14);
+    ctx.font='600 12px Inter, sans-serif';
+  });
+}
+
+function renderCharts(){
+  drawBars(document.getElementById('miniChart'));
+  drawBars(document.getElementById('barChart'));
+  drawPie(document.getElementById('pieChart'));
+}
+
+function renderAll(){ renderKPIs(); renderTable(); renderRecent(); renderCharts(); }
+renderAll();
+window.addEventListener('resize', renderCharts);
+</script>
+</body>
+</html>
